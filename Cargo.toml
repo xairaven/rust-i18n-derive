@@ -1,6 +1,6 @@
 [package]
 name = "rust-i18n-derive"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 
 edition = "2024"
@@ -15,7 +15,7 @@ license = "MIT"
 repository = "https://github.com/xairaven/rust-i18n-derive"
 
 [dependencies]
-rust-i18n-derive-impl = { version = "=0.1.0", path = "impl" }
+rust-i18n-derive-impl = { version = "=1.0.0", path = "impl" }
 
 [workspace]
 resolver = "2"
