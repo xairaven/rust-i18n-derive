@@ -3,7 +3,7 @@ name = "rust-i18n-derive"
 version = "0.1.0"
 authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
 
-edition = "2021"
+edition = "2024"
 rust-version = "1.92"
 
 description = "A Rust derive macro for internationalization (i18n) support."

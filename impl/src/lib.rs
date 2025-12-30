@@ -1,6 +1,6 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Data, DeriveInput, LitStr};
+use syn::{Data, DeriveInput, LitStr, parse_macro_input};
 
 #[proc_macro_derive(Localized, attributes(tag))]
 pub fn localized_derive(input: TokenStream) -> TokenStream {
