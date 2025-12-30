@@ -76,7 +76,7 @@ pub fn localized_derive(input: TokenStream) -> TokenStream {
             }
 
             /// Returns the localized string using rust_i18n::t! macro.
-            fn localize(&self) -> String {
+            fn localize(&self) -> std::borrow::Cow<'static, str> {
                 rust_i18n::t!(self.key())
             }
         }
