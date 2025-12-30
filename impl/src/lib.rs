@@ -4,42 +4,68 @@ use syn::{parse_macro_input, Data, DeriveInput, LitStr};
 
 #[proc_macro_derive(Localized, attributes(tag))]
 pub fn localized_derive(input: TokenStream) -> TokenStream {
-    // Parse the input tokens into a syntax tree
     let input = parse_macro_input!(input as DeriveInput);
     let name = input.ident;
 
-    // Ensure we are working with an enum
     let variants = match input.data {
         Data::Enum(d) => d.variants,
-        _ => panic!("Localized can only be derived for enums"),
+        _ => {
+            return syn::Error::new_spanned(
+                name,
+                "Localized can only be derived for enums",
+            )
+            .to_compile_error()
+            .into();
+        },
     };
 
-    // Generate match arms for each variant
-    let match_arms = variants.iter().map(|variant| {
+    // We will collect generated match arms here
+    let mut match_arms = Vec::new();
+    // We will collect any errors found here
+    let mut errors = Vec::new();
+
+    for variant in variants {
         let variant_ident = &variant.ident;
+        let tag_attr = variant
+            .attrs
+            .iter()
+            .find(|attr| attr.path().is_ident("tag"));
 
-        // Find the #[tag("...")] attribute
-        let tag_attr = variant.attrs.iter().find(|attr| attr.path().is_ident("tag"));
-
-        let key_literal = if let Some(attr) = tag_attr {
-            // Parse the string literal inside #[tag("...")]
-            attr.parse_args::<LitStr>()
-                .expect("tag attribute must contain a string literal, e.g., #[tag(\"key.name\")]")
-                .value()
+        if let Some(attr) = tag_attr {
+            // Try to parse the attribute content
+            match attr.parse_args::<LitStr>() {
+                Ok(literal) => {
+                    let value = literal.value();
+                    match_arms.push(quote! {
+                        Self::#variant_ident => #value
+                    });
+                },
+                Err(e) => {
+                    // Error if format is wrong, e.g. #[tag(123)] instead of string
+                    errors.push(syn::Error::new_spanned(attr, e.to_string()));
+                },
+            }
         } else {
-            // Fallback: if no tag is provided, maybe panic or use the variant name?
-            // For now, let's panic to enforce explicit mapping.
-            panic!("Variant {} is missing #[tag(\"...\")] attribute", variant_ident);
-        };
-
-        // Generate the code for this variant
-        quote! {
-            Self::#variant_ident => #key_literal
+            // Error if tag is missing completely
+            // new_spanned(variant) makes the error appear on the variant line itself
+            errors.push(syn::Error::new_spanned(
+                variant.clone(),
+                format!("Missing #[tag(\"...\")] for variant `{}`", variant_ident),
+            ));
         }
-    });
+    }
 
-    // Build the impl block
-    // We assume the user has `rust_i18n` available in their crate.
+    // If we found any errors, return them immediately.
+    // This prints nice compiler errors pointing to the specific lines.
+    if !errors.is_empty() {
+        let error_tokens = errors.iter().map(|err| err.to_compile_error());
+        return quote! {
+            #(#error_tokens)*
+        }
+        .into();
+    }
+
+    // If no errors, generate the implementation
     let expanded = quote! {
         impl Localized for #name {
             /// Returns the translation key associated with this variant.
