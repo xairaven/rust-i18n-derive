@@ -1,0 +1,27 @@
+[package]
+name = "rust-i18n-derive-impl"
+version = "0.1.0"
+authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
+
+edition = "2021"
+rust-version = "1.92"
+
+description = "An implementation for Rust internationalization (i18n) support via derive macro."
+categories = ["rust-patterns", "no-std"]
+keywords = ["i18n", "internationalization", "localization", "derive-macro", "derive"]
+
+readme = "../README.md"
+license = "MIT"
+repository = "https://github.com/xairaven/rust-i18n-derive"
+
+[lib]
+proc-macro = true
+
+[lints]
+workspace = true
+
+[dependencies]
+proc-macro2 = "1.0.104"
+quote = "1.0.42"
+syn = "2.0.112"
+rust-i18n = "3"
