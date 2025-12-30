@@ -1,0 +1,43 @@
+[package]
+name = "rust-i18n-derive"
+version = "0.1.0"
+authors = ["Alex Kovalov <alexkovalevkpi@gmail.com>"]
+
+edition = "2021"
+rust-version = "1.92"
+
+description = "A Rust derive macro for internationalization (i18n) support."
+categories = ["rust-patterns", "no-std"]
+keywords = ["i18n", "internationalization", "localization", "derive-macro", "derive"]
+
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/xairaven/rust-i18n-derive"
+
+[dependencies]
+rust-i18n-derive-impl = { version = "=0.1.0", path = "impl" }
+
+[workspace]
+resolver = "2"
+
+members = ["impl"]
+
+[profile.release]
+lto = true
+opt-level = 3
+panic = "abort"
+strip = "symbols"
+
+[workspace.lints.clippy]
+collapsible_if = "warn"
+collapsible_else_if = "warn"
+collapsible_match = "warn"
+collapsible_str_replace = "warn"
+expect_used = "deny"
+indexing_slicing = "deny"
+panic = "deny"
+unwrap_used = "deny"
+
+[workspace.lints.rust]
+unused_doc_comments = "allow"
+unsafe_code = "deny"
